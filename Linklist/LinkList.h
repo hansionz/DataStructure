@@ -18,7 +18,7 @@ typedef struct stack
 typedef struct Node
 {
 	DataType data;
-	struct Node * next;
+	struct Node *next;
 }Node,*pNode,LinkList,*pLinkList;
 
 typedef struct ComplexNode
@@ -63,7 +63,7 @@ void RmoveNodeNotTail(pLinkList *ppl, pNode pos);
 //用链表实现约瑟夫环
 void JosephCircle(pLinkList *ppl, int sz);
 //链表的逆置
-void Reverselist(pLinkList *ppl);
+pNode Reverselist_op(pLinkList *ppl);
 //链表的冒泡排序
 void BubbleSort(pLinkList *ppl);
 //合并两个有序的链表，合并后依然有序
@@ -86,7 +86,15 @@ int IsCross(pLinkList plist1, pLinkList plist2);
 pNode GetMeetNode(pLinkList plist1, pLinkList plist2);
 //求两个链表中相同的数据(交集)
 void UnionSet(pLinkList plist1, pLinkList plist2);
-
+//删除无序链表中的第二大结点，不能排序
+int FindSecondNode(pLinkList plist);
+void DeleteNode(pLinkList plist, int max2);
+/********************************************************/
+/*LeetCode*/
+//链表的隔断插入
+void ListInsertConstant(pLinkList pl);
+/********************************************************/
+/*复杂链表的复制*/
 //复杂链表的复制
 pComplexNode CopyComplexList(pComplexNode plist);
 //开辟一个数据域为d的复杂结点
@@ -103,7 +111,7 @@ typedef struct ListNode
 	struct ListNode* _next;
 	struct ListNode* _prev;
 }ListNode;
-
+//链表的头
 typedef struct List
 {
 	ListNode* _head;

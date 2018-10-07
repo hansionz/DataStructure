@@ -1,6 +1,6 @@
 #include"LinkList.h"
 
-void InitLinkList(pLinkList * ppl)
+void InitLinkList(pLinkList* ppl)
 {
 	assert(ppl != NULL);
 	*ppl = NULL;
@@ -49,7 +49,7 @@ void PopBack(pLinkList* ppl)
 	if ((*ppl)->next == NULL)
 	{
 		free(*ppl);
-		ppl = NULL;
+		*ppl = NULL;
 	}
 	else
 	{
@@ -124,12 +124,6 @@ void PrintLinkTailToHead(pLinkList pl,stack * s)
 		}
 		printf("%d--->",pl->data);
 	}
-	/*if (pl == NULL)
-	{
-		return NULL;
-	}
-	PrintLinkTailToHead(pl->next);
-	printf("%d--->", pl->data);*/
 #endif
 #if 0
 	pNode tail = NULL;
@@ -145,19 +139,24 @@ void PrintLinkTailToHead(pLinkList pl,stack * s)
 	}
 #endif
 	Node* cur = pl;
+	//将所有结点值入栈
 	while (cur != NULL)
 	{
 		s->data[s->top++] = cur->data;
 		cur = cur->next;
 	}
-	while (s->top >= 0)
+	//出栈并打印
+	while (s->top > 0)
 	{
-		printf("%d--->", s->data[s->top--]);
+		printf("%d--->", s->data[--s->top]);
 	}
 	printf("over\n");
 }
+
 void RmoveNodeNotTail(pLinkList *ppl, pNode pos)
 {
+	//1.如果是尾结点(尾删)
+	//2.如果不是尾结点(替换删除)
 	pNode del = NULL;
 	assert(ppl != NULL);
 	assert(pos->next != NULL);
@@ -175,6 +174,7 @@ void Insert(pLinkList* ppl, pNode pos, DataType data)
 	assert(ppl != NULL);
 	assert(pos != NULL);
 	assert(*ppl != NULL);
+
 	pNode NewNode = BuyNode(data);
 	if (*ppl == pos)
 	{
@@ -330,7 +330,7 @@ void JosephCircle(pLinkList *ppl, int k)
 	pNode cur = *ppl;
 	pNode tmp = *ppl;
 	pNode del = NULL;
-	//将单链表连成一个换
+	//将单链表连成一个环
 	while (tmp->next)
 	{
 		tmp = tmp->next;
@@ -348,7 +348,7 @@ void JosephCircle(pLinkList *ppl, int k)
 		//删除当前结点
 		del = cur->next;
 		printf("删除：%d\n", cur->data);
-		cur->data = cur->next->data;
+		cur->data = del->data;
 		cur->next = del->next;
 		free(del);
 		del = NULL;
@@ -357,23 +357,52 @@ void JosephCircle(pLinkList *ppl, int k)
 }
 void Reverselist(pLinkList *ppl)
 {
+	assert(ppl);
 	pNode cur = *ppl;
 	pNode tmp = NULL;
 	pLinkList head = NULL;
 	assert(ppl != NULL);
+	//如果链表中只有一个结点或者没有结点，不用反转
 	if (*ppl == NULL || (*ppl)->next == NULL)
 	{
 		return;
 	}
+
 	while (cur)
 	{
-		tmp = cur->next;//保存下一个结点，否则会丢失链表后边的内容
+		//保存下一个结点，否则会丢失链表后边的内容
+		tmp = cur->next;
+		//头插
 		cur->next = head;
 		head = cur;
+		//改变指向指向下一个继续
 		cur = tmp;
 	}
 	*ppl = head;
 }
+//三指针法
+pNode Reverselist_op(pLinkList *ppl)
+{
+	assert(ppl != NULL);
+	pLinkList reverselist = NULL;
+	pNode curnode = *ppl;
+	pNode prev = NULL;
+	while (curnode)
+	{
+		pNode next = curnode->next;//保留下一个结点
+		if (next == NULL)
+		{
+			reverselist = curnode;
+		}
+		//改变指向前一个结点
+		curnode->next = prev;
+		//调整prev、curnode继续
+		prev = curnode;
+		curnode = next;
+	}
+	return reverselist;
+}
+//单链表的冒泡排序
 void BubbleSort(pLinkList *ppl)
 {
 	assert(ppl != NULL);
@@ -398,19 +427,14 @@ void BubbleSort(pLinkList *ppl)
 pNode Merge(pLinkList list1, pLinkList list2)
 {
 	pLinkList newhead = NULL;
-	//一个链表为空，另一个不为空
+	//一个链表为空，另一个不为空或者两个链表都为空
 	if (list1 == NULL)
 	{
 		return list2;
 	}
-	if (list2 == NULL)
+	else if (list2 == NULL)
 	{
 		return list1;
-	}
-	//两个链表都为空
-	if ((list1 == NULL) && (list2 == NULL))
-	{
-		return NULL;
 	}
 	//无头结点的单链表，必须先插入一个结点才能将以后的结点操作统一
 	if (list1->data < list2->data)
@@ -453,19 +477,17 @@ pNode Merge(pLinkList list1, pLinkList list2)
 }
 pNode Merge_R(pLinkList list1, pLinkList list2)
 {
-	pLinkList newhead = NULL;
+	//处理链表为空
 	if (list1 == NULL)
 	{
 		return list2;
 	}
-	if (list2 == NULL)
+	else if (list2 == NULL)
 	{
 		return list1;
 	}
-	if ((list1 == NULL) && (list2 == NULL))
-	{
-		return NULL;
-	}
+	//递归合并
+	pLinkList newhead = NULL;
 	if (list1->data < list2->data)
 	{
 		newhead = list1;
@@ -500,9 +522,9 @@ pNode FindLastKNode(pLinkList plist, int k)
 {
 	pNode fast = plist;
 	pNode slow = plist;
-	if (plist == NULL)
+	if (plist == NULL || k == 0)
 	{
-		return plist;
+		return NULL;
 	}
 	//快指针走k-1步
 	while (--k)
@@ -617,12 +639,12 @@ pNode GetMeetNode(pLinkList plist1, pLinkList plist2)
 		cur1 = plist2;
 		cur2 = plist1;
 	}
-	//长链表走gap步
+	//较长链表先走gap步
 	while (gap--)
 	{
 		cur1 = cur1->next;
 	}
-	//一起走
+	//两个指针一起走一起走
 	while (cur1!=cur2)
 	{
 		cur1 = cur1->next;
@@ -685,7 +707,7 @@ void PrintComplexList(pComplexNode plist)
 	}
 	printf("over\n");
 }
-
+//复杂链表的复制
 pComplexNode CopyComplexList(pComplexNode plist)
 {
 	pComplexNode cur = plist;
@@ -711,9 +733,12 @@ pComplexNode CopyComplexList(pComplexNode plist)
 		cur = cp->next;
 	}
 	//③拆除链表
-	cur = plist;
-	cp = cur->next;
-	newlist = cp;
+	if (plist != NULL)
+	{
+		cur = plist;
+		cp = cur->next;
+		newlist = cp;
+	}
 	while (cur!=NULL)
 	{
 		cur->next = cp->next;
@@ -724,8 +749,10 @@ pComplexNode CopyComplexList(pComplexNode plist)
 	}
 	return newlist;
 }
+
 /*************************************************************************/
 /*双向循环带头链表*/
+
 //创建一个双向循环链表结点
 ListNode* BuyListNode(CLDataType x)
 {
@@ -737,6 +764,7 @@ ListNode* BuyListNode(CLDataType x)
 	cur->_data = x;
 	cur->_next = NULL;
 	cur->_prev = NULL;
+	return cur;
 }
 //初始化双向循环带头链表
 void ListInit(List* pcl)
@@ -751,7 +779,7 @@ void ListInit(List* pcl)
 void ListDestory(List* pcl)
 {
 	assert(pcl);
-	ListNode* cur = pcl->_head;
+	ListNode* cur = pcl->_head->_next;
 	while (cur != pcl->_head)
 	{
 		ListNode* tmp = cur->_next;
@@ -782,7 +810,7 @@ void ListInsert(ListNode* pos, CLDataType x)
 	ListNode* newnode = BuyListNode(x);
 	//保存前面结点(建议这么写，如果直接用指针完会太绕了)
 	ListNode* prev = pos->_prev;
-	//prev newnode pos指针连接起来
+	//prev-newnode-pos指针连接起来
 	prev->_next = newnode;
 	newnode->_prev = prev;
 	newnode->_next = pos;
@@ -867,4 +895,110 @@ ListNode* FindListNode(List* pcl, CLDataType x)
 		cur = cur->_next;
 	}
 	return NULL;
+}
+
+/*LeetCode练习题目*/
+//找链表的第二大结点
+int FindSecondNode(pLinkList plist)
+{
+	if (plist == NULL || plist->next == NULL)
+	{
+		return -1;
+	}
+	int max = INT_MAX;
+	int max2 = INT_MIN;
+	pNode cur = plist;
+	while (cur!=NULL)
+	{
+		if (cur->data > max)
+		{
+			max2 = max;
+			max = cur->data;
+		}
+		else if (cur->data < max)
+		{
+			max2 = cur->data;
+		}
+		cur = cur->next;
+	}
+	return max2;
+}
+//链表的隔断插入
+void ListInsertConstant(pLinkList pl)
+{
+	if (pl == NULL || pl->next == NULL)
+	{
+		return;
+	}
+	//1.找到链表的中间结点(快慢指针)
+	pNode fast = pl;
+	pNode slow = pl;
+	while ((fast != NULL) && (fast->next != NULL))
+	{
+		fast = fast->next->next;
+		slow = slow->next;
+	}
+	//2.以中间节点将链表分为两条链表
+	pLinkList twolist = slow->next;
+	slow->next = NULL;
+	//3.逆置后边的那条链表
+	pLinkList newlist = NULL;
+	pNode cur = twolist;
+	while (cur != NULL)
+	{
+		pNode tmp = cur->next;
+		cur->next = newlist;
+		newlist = cur;
+		cur = tmp;
+	}
+	twolist = newlist;
+
+	//4.隔断插入1-2-3-4-5 > 1-5-2-4-3
+	fast = pl;
+	slow = pl->next;
+	cur = twolist;
+	while (cur)
+	{
+		pNode tmp = cur->next;
+		cur->next = slow;
+		fast->next = cur;
+		slow = slow->next;
+		fast = fast->next->next;
+		cur = tmp;
+	}
+}
+void ListInsertConstantC(pLinkList pl)
+{
+	if (pl == NULL || pl->next == NULL)
+	{
+		return;
+	}
+	//1.找到链表的中间结点(快慢指针)
+	pNode fast = pl;
+	pNode slow = pl;
+	while ((fast != NULL) && (fast->next != NULL))
+	{
+		fast = fast->next->next;
+		slow = slow->next;
+	}
+
+	pNode cur = pl;
+	pNode prev = NULL;
+	pNode pre_node = pl;
+	pNode last_node = pl->next;
+	while (slow->next != NULL)
+	{
+		while (cur->next != NULL)
+		{
+			prev = cur;
+			cur = cur->next;
+		}
+		prev->next = NULL;
+
+		cur->next = last_node;
+		pre_node->next = cur;
+
+		last_node = last_node->next;
+		pre_node = pre_node->next->next;
+	}
 }

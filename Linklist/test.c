@@ -10,8 +10,8 @@ void TestReverselist()
 	PushBack(&list, 3);
 	PushBack(&list, 4);
 	PrintLinkList(&list);
-	Reverselist(&list);
-	PrintLinkList(&list);
+	pNode newlist=Reverselist(&list);
+	PrintLinkList(&newlist);
 }
 void TestInsertNodeNotHead()
 {
@@ -97,6 +97,9 @@ void TestInsert()
 	pos = Find(list, 2);
 	Insert(&list, pos, 5);
 	PrintLinkList(&list);
+	printf("%d ", FindSecondNode(list));
+	/*ListInsertConstantC(list);
+	PrintLinkList(&list);*/
 }
 void TestRemove()
 {
@@ -390,7 +393,7 @@ int main()
 	/*TestPopBack();*/
 	/*TestPushFront();*/
 	/*TestPopFront();*/
-	/*TestInsert();*/
+	TestInsert();
 	/*TestErase();*/
 	/*TestRemove();*/
 	//TestRemoveAll();
@@ -405,6 +408,6 @@ int main()
 	/*TestIsCross();*/
 	/*TestUnionSet();*/
 	/*TestCopyComplexList();*/
-	TestListNode();
+	/*TestListNode();*/
 	return 0;
 }
